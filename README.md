@@ -1,9 +1,9 @@
-Usage
+# Usage
 
-npm install
+1)npm install
 
-node server.js
+2)node server.js
 
-http://localhost:1234/ (ajax chat);
+3) In browser: http://localhost:1234/ (ajax chat);
 
-http://localhost:1234/socket (socket chat);
+4) In borwser: http://localhost:1234/socket (socket chat);
