@@ -1,0 +1,123 @@
+doctype html
+html
+    head
+        link(href='https://fonts.googleapis.com/css?family=Lato:400,300' rel='stylesheet' type='text/css')
+        link(href='main.css' rel='stylesheet' type='text/css')
+        title Socket
+    body
+        div.container
+            div.name
+                input(type='text' placeholder="What's your nickname?" id='nameInput')
+            div.messagesContainer
+                ul#messages
+                input(type='text' placeholder='Enter Your Message' id='textInput')
+                input(type='button' value='Send' id='textSubmit')
+        script(type='text/javascript').
+            
+            (function() {
+                var nameButton = document.getElementById('nameButton'),
+                nameInput = document.getElementById('nameInput'),
+                messages = document.getElementById('messages'),
+                text = document.getElementById('textInput'),
+                textSubmit = document.getElementById('textSubmit');
+            
+
+                var userName = 'User1';
+
+
+                nameInput.onkeydown = function(event) {
+                    var keycode = event.keyCode;
+                    if (keycode === 13) {
+                         userName = this.value || "User1";
+                         this.style.opacity = 0;
+                         var h2 = document.createElement('h2');
+                         h2.innerHTML = this.value;
+                         this.parentNode.appendChild(h2);
+                    }
+                }
+
+                text.onkeydown = function(event) {
+                    var keycode = event.keyCode;
+                    if (keycode === 13) {
+                        var data = {
+                            name: userName,
+                            text: textInput.value
+                        };
+                        console.log(data);
+                        textInput.value = '';
+                        ajaxRequest({
+                            method: 'POST',
+                            url: '/messages',
+                            data: data
+                        });
+                        setTimeout(function() {
+                            messages.scrollTop = messages.scrollHeight;
+                        }, 1100);
+                    }
+                };
+
+                textSubmit.onclick = function() {
+                    var data = {
+                        name: userName,
+                        text: text.value
+                    };
+                    console.log(data);
+                    textInput.value = '';
+                    ajaxRequest({
+                        method: 'POST',
+                        url: '/messages',
+                        data: data
+                    });
+                     setTimeout(function() {
+                            messages.scrollTop = messages.scrollHeight;
+                        }, 1100);
+                };
+
+
+                var ajaxRequest = function(options) {
+                    var url = options.url || '/',
+                    method = options.method || 'GET',
+                    callback = options.callback || function () {},
+                    data = options.data || {},
+                    xmlHttp = new XMLHttpRequest();
+
+                    xmlHttp.open(method, url, true);
+                    xmlHttp.setRequestHeader('Content-Type', 'application/json');
+                    xmlHttp.send(JSON.stringify(data));
+                    xmlHttp.onreadystatechange = function() {
+                        if (xmlHttp.status === 200 && xmlHttp.readyState === 4) {
+                            console.log(xmlHttp.responseText)
+                            callback(xmlHttp.responseText);
+                        }
+                    };
+                };
+
+                var getData = function() {
+                    ajaxRequest({
+                        url: '/messages',
+                        method: 'GET',
+                        callback: function(msg) {
+                            var msg = JSON.parse(msg);
+                            messages.innerHTML = '';
+                            for (var i in msg) {
+                                if (msg.hasOwnProperty(i)) {
+                                    var el = document.createElement('li');
+                                    el.innerHTML = "<p>" + "<span class='n'>" + msg[i].name + "</span><br><span class='t'>" + msg[i].text + "</span></p>";
+                                    messages.appendChild(el);
+                                    
+                                }
+                            }
+                            
+                        }
+                    });
+                };
+
+
+
+
+                getData();
+                setInterval(function() {
+                    getData();
+                }, 1000);
+            })();
+
